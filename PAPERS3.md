@@ -78,15 +78,17 @@ the console's offer before supplying a Pokemon. Thus "Waiting for console"
 with "Ready / Choose a game" does not by itself prove a display hardware fault.
 This fork documents these limitations and does not patch the official Mac App.
 
-### Clearer status text (source revision, not yet flashed)
+### Clearer status text
 
 ![Simulated screen: active room without App preview data](docs/assets/papers3/status/hosting-no-preview-simulation.png)
 
 Firmware-rendered simulation, not a photograph. See the
 [eight-state simulation gallery](docs/assets/papers3/status/gallery-simulation.png).
 
-The pending display-only revision separates radio state from App preview data.
+The display-only revision separates radio state from App preview data.
 It keeps the official App, protocol, pin setup and refresh scheduling unchanged.
+The source at `4e8f4ce1` was built on GitHub, written with owner approval, and
+independently read back with a matching SHA-256 on 2026-10-20.
 
 | Data available to the panel | Display |
 |---|---|
@@ -172,6 +174,12 @@ NVS 0x9000, PHY 0xf000, factory app 0x10000 with 1 MiB capacity, merged offset 0
 - Official macOS arm64 App v0.32.0 recognized variant 2. Its bundled Z-A CLI
   reached AP-up/hosting on channel 6 for 15 seconds and stopped with exit 0.
   No Switch joined, and no trade was attempted.
+- Status-text revision `4e8f4ce1`: write/readback matched. A 35-second USB
+  control/display run completed five driver refreshes: idle, a test AP without
+  preview, Arceus/Pikachu names without an image, the Pikachu sprite, and back
+  to idle. There were no additional framing/rejected-frame errors, resyncs or
+  disconnects after initial USB negotiation. This used a test AP, not a game
+  session. Physical appearance of the revised labels awaits owner confirmation.
 - Six native parser tests plus nineteen upstream display tests pass (25 total).
   Tests execute the real C parser against the official Python host encoders:
   odd-width and maximum sprites, all slots, malformed/truncated payloads,
@@ -192,10 +200,16 @@ With development dependencies installed, also run the upstream screen tests:
 python -m pytest tests/test_papers3_display_model.py tests/test_esp32_screen.py -q
 ```
 
-The tested merged image was 701,248 bytes, with SHA-256:
+The initial variant 2 merged image was 701,248 bytes, with SHA-256:
 
 ```text
 aa8289eed41e191103b22f2a015408b0ca62aebbbb418b19002ba6c216915bcb
+```
+
+The installed status-text revision at `4e8f4ce1` is 701,728 bytes, with SHA-256:
+
+```text
+a4eb1c15b3b4a4b07227e03614a31ec283ece73baa15db46841ae3d64819c01b
 ```
 
 This identifies the locally tested build, not a guarantee that another checkout
