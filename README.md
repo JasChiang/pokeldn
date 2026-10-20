@@ -11,6 +11,8 @@
 
 # pokeldn
 
+[English](README.md) | [繁體中文](README.zh-TW.md)
+
 Trade with retail Pokémon games on Switch and Switch 2 through an ESP32 board connected to your
 computer by USB. Nothing is installed on the console.
 
