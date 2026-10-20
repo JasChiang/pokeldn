@@ -21,6 +21,7 @@
 # Example plugins for authors (docs/plugins.md); not bundled into the app.
 !/examples/
 /firmware/**/build/
+/firmware/**/build-papers3*/
 /firmware/**/sdkconfig
 /firmware/**/sdkconfig.old
 /firmware/**/dependencies.lock

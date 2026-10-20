@@ -73,7 +73,9 @@ static atomic_uint s_rx_mgmt, s_rx_eth, s_tx_eth, s_tx_eth_failed, s_tx_raw, s_t
 static atomic_uint s_tx_acked, s_tx_unacked;
 static atomic_uint s_rx_sniff;   /* frames RX_SNIFF carried: the LED's activity while sniffing */
 static atomic_int s_ap_stations;
+#if !POKELDN_PAPERS3
 static atomic_uint s_presses;   /* BOOT presses: each wakes the screen */
+#endif
 static atomic_uint s_led_alarm;   /* a join that failed or a key refused: the LED's warning */
 static atomic_uint s_tx_eth_retried;   /* ETH_TX calls that found the driver's queue full */
 static atomic_int s_tx_eth_last_err;
@@ -586,6 +588,7 @@ static void wifi_event(void *arg, esp_event_base_t base, int32_t id, void *data)
     }
 }
 
+#if !POKELDN_PAPERS3
 /* A BOOT press: u32 board time in µs, u16 press count, for the host's trace. */
 static void button_pressed(uint32_t count, int64_t press_us)
 {
@@ -616,6 +619,9 @@ static void led_state(led_look_t *look, uint32_t *activity, uint32_t *alarm)
              wire_rx_buffer_full();
 }
 
+#endif
+
+#if !POKELDN_PAPERS3 || POKELDN_PAPERS3_EPAPER
 static void display_state(scene_radio_t *state)
 {
     static const uint8_t SCENES[] = {
@@ -627,8 +633,13 @@ static void display_state(scene_radio_t *state)
     state->stations = stations > 0 ? (uint8_t)stations : 0;
     state->rx = atomic_load(&s_rx_eth);
     state->tx = atomic_load(&s_tx_acked) + atomic_load(&s_tx_unacked);
+#if !POKELDN_PAPERS3
     state->presses = atomic_load(&s_presses);
+#else
+    state->presses = 0;
+#endif
 }
+#endif
 
 static void send_status(void)
 {
@@ -653,6 +664,13 @@ static void send_status(void)
         atomic_load(&s_tx_queued_n),
         atomic_load(&s_tx_handed_head) - atomic_load(&s_tx_handed_tail));
     if (len < 0) return;
+#if POKELDN_PAPERS3_EPAPER
+    if (len < (int)sizeof(text) - 1) {
+        const int more = snprintf(text + len, sizeof(text) - len, " epd=%s epd_updates=%lu",
+                                  papers3_display_state(), (unsigned long)papers3_display_updates());
+        if (more > 0) len += more;
+    }
+#endif
     if (len < (int)sizeof(text) - 1) {
         text[len++] = ' ';
         const int more = wire_stats(text + len, sizeof(text) - len);
@@ -698,7 +716,15 @@ static void send_info(void)
 #else
 #define LINK_WORD ""
 #endif
-    snprintf(text, sizeof(text), "pokeldn-radio " CONFIG_IDF_TARGET " version=%s idf=" IDF_VER LINK_WORD,
+    snprintf(text, sizeof(text), "pokeldn-radio " CONFIG_IDF_TARGET " version=%s idf=" IDF_VER LINK_WORD
+#if POKELDN_PAPERS3
+#if POKELDN_PAPERS3_EPAPER
+             " board=PaperS3 variant=2 display=epaper"
+#else
+             " board=PaperS3 variant=1"
+#endif
+#endif
+             ,
              esp_app_get_description()->version);
     wire_send(MSG_INFO, head, sizeof(head), text, strlen(text));
     usbwatch_report();
@@ -825,6 +851,19 @@ static void rf_switch_on(void)
 
 void app_main(void)
 {
+#if POKELDN_PAPERS3
+    /* M5GFX PaperS3 init holds PWROFF_PULSE (GPIO44) low. M5Unified powers
+       off with repeated 50 ms pulses, not a periodic keepalive. EPD power
+       (GPIO45) and the buzzer (GPIO21) stay off in this radio-only build. */
+    ESP_ERROR_CHECK(gpio_set_level(GPIO_NUM_44, 0));
+    ESP_ERROR_CHECK(gpio_set_level(GPIO_NUM_45, 0));
+    ESP_ERROR_CHECK(gpio_set_level(GPIO_NUM_21, 0));
+    const gpio_config_t papers3_outputs = {
+        .pin_bit_mask = (1ULL << 44) | (1ULL << 45) | (1ULL << 21),
+        .mode = GPIO_MODE_OUTPUT,
+    };
+    ESP_ERROR_CHECK(gpio_config(&papers3_outputs));
+#endif
 #if CONFIG_IDF_TARGET_ESP32C6
     rf_switch_on();
 #endif
@@ -850,8 +889,12 @@ void app_main(void)
 #endif
     wire_start(command);
     usbwatch_start();
+#if !POKELDN_PAPERS3
     led_start(led_state, button_pressed);
+#endif
+#if !POKELDN_PAPERS3 || POKELDN_PAPERS3_EPAPER
     display_start(display_state);
+#endif
     send_info();
 
     int64_t last_status = 0;

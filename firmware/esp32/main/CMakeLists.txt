@@ -11,10 +11,31 @@ if(DEFINED ENV{POKELDN_BLE})
     set(ble_component bt)
 endif()
 
+set(display_source display.c)
+if(DEFINED ENV{POKELDN_PAPERS3_EPAPER})
+    if(NOT DEFINED ENV{POKELDN_PAPERS3} OR NOT idf_target STREQUAL "esp32s3")
+        message(FATAL_ERROR "POKELDN_PAPERS3_EPAPER requires POKELDN_PAPERS3 and esp32s3")
+    endif()
+    set(display_source "")
+    set(display_component papers3_display)
+endif()
+
 idf_component_register(
-    SRCS "radio.c" "ble.c" "wire.c" "led.c" "usbwatch.c" "display.c" "scene.c" "screen.c"
+    SRCS "radio.c" "ble.c" "wire.c" "led.c" "usbwatch.c" ${display_source} "scene.c" "screen.c"
     INCLUDE_DIRS "."
-    PRIV_REQUIRES esp_app_format esp_wifi wpa_supplicant ${wire_driver} esp_driver_ledc esp_driver_gpio esp_driver_i2c esp_timer nvs_flash esp_event ${ble_component})
+    PRIV_REQUIRES esp_app_format esp_wifi wpa_supplicant ${wire_driver} esp_driver_ledc esp_driver_gpio esp_driver_i2c esp_timer nvs_flash esp_event ${ble_component} ${display_component})
+
+if(DEFINED ENV{POKELDN_PAPERS3_EPAPER})
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE POKELDN_PAPERS3_EPAPER=1)
+endif()
+
+# Opt-in PaperS3 radio-only build. Keep the release source checkout untouched.
+if(DEFINED ENV{POKELDN_PAPERS3})
+    if(NOT idf_target STREQUAL "esp32s3")
+        message(FATAL_ERROR "POKELDN_PAPERS3 requires esp32s3")
+    endif()
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE POKELDN_PAPERS3=1)
+endif()
 
 # A diagnostic build: POKELDN_USB_BEACON=1 in the environment of idf.py (usbwatch.c).
 if(DEFINED ENV{POKELDN_USB_BEACON})

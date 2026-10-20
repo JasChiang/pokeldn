@@ -1,0 +1,67 @@
+{
+  "kind": "firmware renderer simulation, not a hardware capture",
+  "drawing_source_sha256": "bd911d04b6c0177998f57a1cd2b894800ce8ba3be1e0f43ba4d554f084a2dcef",
+  "canvas": [
+    960,
+    540
+  ],
+  "renderer": "unchanged firmware draw functions + M5GFX LGFX_Sprite and Font2/Font4",
+  "limitations": "No panel waveforms, ghosting, ambient lighting or hardware framebuffer readback",
+  "sprites_source": "https://github.com/PokeAPI/sprites",
+  "examples": [
+    {
+      "species": 25,
+      "name": "Pikachu",
+      "sprite_sha256": "49e9816a16c0c886233e25d9b91f7ee86ac5083c93aa973a9b210528555f72ec",
+      "one_bit_size": [
+        41,
+        49
+      ]
+    },
+    {
+      "species": 133,
+      "name": "Eevee",
+      "sprite_sha256": "e570cccf3ae4be311cf9ba3abba731a2b579a71b1c837bc642d4e6cc9a20ed0f",
+      "one_bit_size": [
+        39,
+        40
+      ]
+    },
+    {
+      "species": 6,
+      "name": "Charizard",
+      "sprite_sha256": "2896ad7b2231bb914ad5109a24b6d25443af738cb48ab232d8feb1a5d35882d2",
+      "one_bit_size": [
+        64,
+        62
+      ]
+    },
+    {
+      "species": 94,
+      "name": "Gengar",
+      "sprite_sha256": "516cf00380dcd1da7e2a300849e124fddbef5cf868d8e3075678635b8410fc84",
+      "one_bit_size": [
+        51,
+        45
+      ]
+    },
+    {
+      "species": 448,
+      "name": "Lucario",
+      "sprite_sha256": "fff5dbfe77213ab49bde7b7062aee3d851a2ecb5ec727596d32d5bff04d6ddf2",
+      "one_bit_size": [
+        46,
+        63
+      ]
+    },
+    {
+      "species": 493,
+      "name": "Arceus",
+      "sprite_sha256": "a2ddf0234354ef5730b504482a9c8c1861f1e557ff43d15ccf078633867d327c",
+      "one_bit_size": [
+        59,
+        64
+      ]
+    }
+  ]
+}

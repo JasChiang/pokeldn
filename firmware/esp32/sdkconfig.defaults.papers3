@@ -1,0 +1,4 @@
+# Radio only: no PSRAM or electronic-paper buffers are needed.
+# Match the PaperS3's physical flash, retaining upstream's proven DIO mode.
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=n
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
