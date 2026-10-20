@@ -35,6 +35,9 @@ screenshots. The six sprites were also sent to a physical PaperS3. Firmware
 write/readback, USB/display stress checks and Legends Z-A AP startup passed;
 Switch association and trades have **not** been tested on this board.
 See [PaperS3 build instructions, hardware results and recovery notes](PAPERS3.md).
+The proposed [clearer status labels](PAPERS3.md#clearer-status-text-source-revision-not-yet-flashed)
+distinguish an active room with no preview data from a missing image; this UI
+revision is simulated and build-checked separately before any device write.
 
 ## Supported games
 

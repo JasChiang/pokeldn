@@ -86,6 +86,26 @@ BDSP「依接收玩家產生配信」則是另一種情況：上游會等 Switch
 才送出寶可夢預覽。本 fork 不修改官方 Mac App，將這些行為列為
 [相容性限制](PAPERS3.md#official-app-preview-limitations)。
 
+### 狀態文字改善（尚未燒錄）
+
+![模擬畫面：房間已啟動，尚未收到 App 預覽資料](docs/assets/papers3/status/hosting-no-preview-simulation.png)
+
+這是韌體繪圖模擬，不是實機照片。另有
+[八種狀態完整圖集](docs/assets/papers3/status/gallery-simulation.png)。
+
+新的韌體原始碼會分開顯示以下情況，官方 Mac App 保持不變：
+
+| 狀態 | 電子紙文字 |
+|---|---|
+| 待機，沒有預覽 | `Idle`，提示在 App 開始工作階段 |
+| 房間已啟動，未收到預覽 | `Room active / Waiting for App display data` |
+| 名稱已收到，但沒有圖片 | 保留名稱，在精靈球下標示 `Image unavailable` |
+| 名稱與圖片皆收到 | 顯示原有寶可夢預覽 |
+
+上方仍會顯示 `Waiting for console` 或連線狀態，因此不會再用 `Ready / Choose a game`
+同時代表「未開始」與「已開始但資料未到」。這項改善只能說明裝置收到的資料，
+不能補出 App 沒有傳送的寶可夢。畫面仍採現有英文字型；更新實體裝置前會另行確認。
+
 ## 編譯與還原
 
 啟用 ESP-IDF v6.1 後，在 repo 根目錄執行：

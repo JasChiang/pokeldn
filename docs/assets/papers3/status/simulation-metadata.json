@@ -1,0 +1,96 @@
+{
+  "kind": "firmware renderer simulation, not a hardware capture",
+  "drawing_source_sha256": "218580c99548b5232e4a124b36daa8967d13265f53e02c03dc99565f29d4b92e",
+  "canvas": [
+    960,
+    540
+  ],
+  "renderer": "unchanged firmware draw functions + M5GFX LGFX_Sprite and Font2/Font4",
+  "limitations": "No panel waveforms, ghosting, ambient lighting or hardware framebuffer readback",
+  "sprites_source": "https://github.com/PokeAPI/sprites",
+  "examples": [
+    {
+      "file": "idle-simulation.png",
+      "label": "Idle",
+      "species": null,
+      "name": null,
+      "radio_mode": 0,
+      "stations": 0,
+      "sprite_sha256": null,
+      "one_bit_size": null
+    },
+    {
+      "file": "hosting-no-preview-simulation.png",
+      "label": "Room active, no preview received",
+      "species": null,
+      "name": null,
+      "radio_mode": 3,
+      "stations": 0,
+      "sprite_sha256": null,
+      "one_bit_size": null
+    },
+    {
+      "file": "hosting-no-image-simulation.png",
+      "label": "Names received, image unavailable",
+      "species": 25,
+      "name": "Pikachu",
+      "radio_mode": 3,
+      "stations": 0,
+      "sprite_sha256": null,
+      "one_bit_size": null
+    },
+    {
+      "file": "hosting-with-preview-simulation.png",
+      "label": "Names and image received",
+      "species": 25,
+      "name": "Pikachu",
+      "radio_mode": 3,
+      "stations": 0,
+      "sprite_sha256": "49e9816a16c0c886233e25d9b91f7ee86ac5083c93aa973a9b210528555f72ec",
+      "one_bit_size": [
+        41,
+        49
+      ]
+    },
+    {
+      "file": "joining-no-preview-simulation.png",
+      "label": "Joining, no preview received",
+      "species": null,
+      "name": null,
+      "radio_mode": 1,
+      "stations": 0,
+      "sprite_sha256": null,
+      "one_bit_size": null
+    },
+    {
+      "file": "linked-no-preview-simulation.png",
+      "label": "Linked, no preview received",
+      "species": null,
+      "name": null,
+      "radio_mode": 2,
+      "stations": 0,
+      "sprite_sha256": null,
+      "one_bit_size": null
+    },
+    {
+      "file": "connected-no-preview-simulation.png",
+      "label": "Hosting with one console, no preview",
+      "species": null,
+      "name": null,
+      "radio_mode": 3,
+      "stations": 1,
+      "sprite_sha256": null,
+      "one_bit_size": null
+    },
+    {
+      "file": "scanning-no-preview-simulation.png",
+      "label": "Scanning, no preview received",
+      "species": null,
+      "name": null,
+      "radio_mode": 4,
+      "stations": 0,
+      "sprite_sha256": null,
+      "one_bit_size": null
+    }
+  ]
+}

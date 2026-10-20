@@ -78,6 +78,36 @@ the console's offer before supplying a Pokemon. Thus "Waiting for console"
 with "Ready / Choose a game" does not by itself prove a display hardware fault.
 This fork documents these limitations and does not patch the official Mac App.
 
+### Clearer status text (source revision, not yet flashed)
+
+![Simulated screen: active room without App preview data](docs/assets/papers3/status/hosting-no-preview-simulation.png)
+
+Firmware-rendered simulation, not a photograph. See the
+[eight-state simulation gallery](docs/assets/papers3/status/gallery-simulation.png).
+
+The pending display-only revision separates radio state from App preview data.
+It keeps the official App, protocol, pin setup and refresh scheduling unchanged.
+
+| Data available to the panel | Display |
+|---|---|
+| Radio idle, no preview | `Idle / Start a session in the Mac app` |
+| Hosting, no SHOW preview | `Room active / Waiting for App display data` |
+| Joining/linked/scanning, no preview | The radio state plus `Waiting for App display data` |
+| SHOW names received, no sprite | Names remain visible; the ball says `Image unavailable` |
+| Names and sprite received | Existing Pokemon preview |
+
+The radio header still distinguishes waiting for a console from a connected
+console. Missing preview data is a neutral state: the firmware cannot tell an
+intentional delay from a command the App never sent. It does not infer the
+selected game or Pokemon. These labels use the current ASCII fonts.
+
+The separate, manually dispatched `PaperS3 status preview` workflow renders
+the actual C++ firmware functions on a standard GitHub Ubuntu runner. It uses
+only public sprite artwork and retains its small simulation artifact for one
+day. It is not part of the weekly upstream schedule and never opens hardware.
+The status renderer can also be invoked with `--status-demo` in the preview
+command below.
+
 There is **no link code field in DISPLAY**, so codes and controls stay in the
 Mac App. Text is capped at the protocol's 21 ASCII characters. No touchscreen
 menu, SD access, game save access or key handling is added.
