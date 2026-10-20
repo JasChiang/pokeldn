@@ -179,7 +179,8 @@ NVS 0x9000, PHY 0xf000, factory app 0x10000 with 1 MiB capacity, merged offset 0
   preview, Arceus/Pikachu names without an image, the Pikachu sprite, and back
   to idle. There were no additional framing/rejected-frame errors, resyncs or
   disconnects after initial USB negotiation. This used a test AP, not a game
-  session. Physical appearance of the revised labels awaits owner confirmation.
+  session. The owner subsequently accepted the revised display. CJK text
+  remains unsupported by the official host's ASCII encoding and current fonts.
 - Six native parser tests plus nineteen upstream display tests pass (25 total).
   Tests execute the real C parser against the official Python host encoders:
   odd-width and maximum sprites, all slots, malformed/truncated payloads,
