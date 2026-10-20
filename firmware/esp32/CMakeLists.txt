@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
+if(DEFINED ENV{POKELDN_PAPERS3_EPAPER})
+    list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/optional_components/papers3_display")
+endif()
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 idf_build_set_property(MINIMAL_BUILD ON)
 project(pokeldn_radio)

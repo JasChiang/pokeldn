@@ -79,6 +79,15 @@ and takes 5000 of 5000 uplink commands with none lost. Its idle free heap at sta
 The classic ESP32 measurements below use the ELEGOO ESP32-D0WD-V3 board unless another board is
 named. Completed trades per board are in [Trades by board](#trades-by-board).
 
+### M5Stack PaperS3
+
+PaperS3 needs a board-specific build: the generic S3 LED/OLED pins overlap its
+buzzer and electronic-paper data bus. The opt-in adaptation initializes its
+power control safely and can add a 960x540 electronic-paper dashboard using
+M5GFX and Octal PSRAM. It preserves the existing USB radio and DISPLAY protocol.
+See [PaperS3 build, test coverage and recovery](../PAPERS3.md). Do not install
+the generic S3 image over this variant without reviewing those pin differences.
+
 ### The USB link after a reset (C6, S3)
 
 Opening the port resets a C6 or S3 through USB Serial/JTAG (reset reason 11, a core reset). With

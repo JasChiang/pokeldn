@@ -20,6 +20,20 @@ Command-line tools run from source.
 The project also documents the games' local wireless protocols. AI tools helped reverse engineer
 those protocols and write parts of the code.
 
+## PaperS3 e-paper fork
+
+This fork adds an opt-in **M5Stack PaperS3 electronic-paper dashboard** to the
+ESP32-S3 radio: radio/session status, game and Pokemon names, and monochrome
+sprites, using the existing desktop App and DISPLAY protocol.
+
+![Six PaperS3 firmware-rendered screen simulations, not device photos](docs/assets/papers3/gallery-simulation.png)
+
+These are **960x540 firmware-rendered simulations**, not photographs or Mac App
+screenshots. The six sprites were also sent to a physical PaperS3. Firmware
+write/readback, USB/display stress checks and Legends Z-A AP startup passed;
+Switch association and trades have **not** been tested on this board.
+See [PaperS3 build instructions, hardware results and recovery notes](PAPERS3.md).
+
 ## Supported games
 
 | | [FRLG](docs/frlg.md) | [LGPE](docs/lgpe.md) | [SwSh](docs/swsh.md) | [BDSP](docs/bdsp.md) | [PLA](docs/pla.md) | [SV](docs/sv.md) | [PLZA](docs/za.md) |

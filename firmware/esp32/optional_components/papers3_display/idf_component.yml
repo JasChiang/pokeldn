@@ -1,0 +1,4 @@
+dependencies:
+  m5gfx:
+    git: https://github.com/m5stack/M5GFX.git
+    version: 347a23274081a105cb9fc0fc3bbf0e15c78e79c3

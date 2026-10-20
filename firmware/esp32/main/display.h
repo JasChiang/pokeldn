@@ -9,6 +9,10 @@
 
 #include "scene.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Called before each frame to fill in the radio's state. */
 typedef void (*display_state_t)(scene_radio_t *state);
 
@@ -18,3 +22,10 @@ bool display_start(display_state_t state);
    queue). Never blocks the caller. */
 bool display_command(const uint8_t *payload, size_t length);
 void display_reset(void);
+#if POKELDN_PAPERS3_EPAPER
+const char *papers3_display_state(void);
+uint32_t papers3_display_updates(void);
+#endif
+#ifdef __cplusplus
+}
+#endif
