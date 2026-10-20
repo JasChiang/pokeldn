@@ -8,6 +8,7 @@ from pathlib import Path
 import random
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -42,6 +43,12 @@ class PaperDisplayModelTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        if sys.platform == "win32":
+            # Windows keeps loaded DLLs locked even after the C calls finish.
+            # Release our own handle before deleting the temporary library.
+            from _ctypes import FreeLibrary
+            FreeLibrary(cls.lib._handle)
+        del cls.lib
         cls.temp.cleanup()
 
     def setUp(self):
