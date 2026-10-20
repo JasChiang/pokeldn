@@ -192,6 +192,32 @@ not a statement that all six Pokemon are legal offers in the selected game.
 5. Stop the session in the App when finished. A retained e-paper image is not
    proof that the radio is still powered or connected.
 
+## Upstream maintenance on GitHub
+
+The `PaperS3 upstream check` workflow checks official upstream `main` every
+Monday at 10:23 Asia/Taipei, or manually from Actions. With no new upstream
+commits it stops after the comparison. With updates it prepares a merge on an
+`automation/upstream-*` branch and opens a PR into this fork's `main`.
+An existing open PR for the same upstream tip and main is not tested again.
+Merge conflicts fail the run for manual resolution; local changes are never
+discarded and main is never force-pushed or automatically merged.
+
+Validation runs entirely on standard GitHub-hosted Ubuntu runners: the DISPLAY
+tests and ESP-IDF v6.1 builds of both PaperS3 variants. It does not use this
+Mac, a self-hosted runner, hardware, keys or private backups. No artifact uploads,
+dependency caches, paid larger runners or release publishing are added.
+The schedule is guarded to this public fork and stops if the repository becomes
+private. Manual `test_current` also validates main when upstream has no changes.
+The repository setting allowing Actions to create PRs is required; jobs receive
+only their declared permissions. A failed run appears in Actions; PR results
+are attached as a comment when a merge candidate was prepared.
+
+Bot-created PRs may require approval for the existing general Check workflow.
+The dedicated validation above runs independently in the upstream workflow;
+passing it does not imply the full general suite or physical hardware passed.
+Check protocol, power/GPIO and dependency changes before merging. Any subsequent
+device write still needs explicit approval.
+
 ## Recovery and privacy
 
 Back up the entire physical Flash before the first write and keep verified
