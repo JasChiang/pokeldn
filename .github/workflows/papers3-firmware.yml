@@ -1,0 +1,44 @@
+name: PaperS3 firmware image
+
+on:
+  workflow_dispatch:
+    inputs:
+      revision:
+        description: Reviewed commit to build (no device access)
+        required: true
+        default: main
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  firmware:
+    if: github.repository == 'JasChiang/pokeldn' && !github.event.repository.private
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    container: espressif/idf:v6.1
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.revision }}
+          persist-credentials: false
+      - name: Build reviewed PaperS3 image without flashing
+        shell: bash
+        run: |
+          set -eo pipefail
+          . "$IDF_PATH/export.sh"
+          bash scripts/build_papers3_epaper.sh
+          mkdir -p image
+          cp firmware/esp32/build-papers3-epaper/pokeldn-radio-s3-papers3-1.6.2-v2.bin image/
+          cp firmware/esp32/build-papers3-epaper/partition_table/partition-table.bin image/
+          cp firmware/esp32/build-papers3-epaper/flash_args image/
+          git rev-parse HEAD > image/source-commit.txt
+          cd image
+          sha256sum *.bin > SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: papers3-epaper-firmware
+          path: image/
+          retention-days: 1
+          if-no-files-found: error
