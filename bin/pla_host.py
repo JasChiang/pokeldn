@@ -411,7 +411,6 @@ def main():
     if args.trade_box and partner is None:
         for n, state in enumerate(box_states, start=1):
             print(f"[pla] trade {n} offers {pla_pokemon.describe(pla_pokemon.decrypt(state['record']))}")
-        screen.offer("pla", box_states[0]["record"])
     if args.trade_box_collect:
         os.makedirs(os.path.expanduser(args.trade_box_collect), exist_ok=True)
     collected = set()
@@ -435,6 +434,12 @@ def main():
         if cap:
             cap.close()
         return 2
+
+    # Opening the radio performs HELLO, which clears the board's display.
+    # Before start(), the async screen worker can finish while no radio exists;
+    # esp32_wlan.display then drops both packets. Cached sprites hit this race.
+    if args.trade_box and partner is None:
+        screen.offer("pla", box_states[0]["record"])
 
     keys = pla.session_keys(transport.ssid)
     print(f"[pla] ssid={transport.ssid.hex()} network_id={keys.network_id:#010x} "
