@@ -33,7 +33,7 @@ jobs:
           cp firmware/esp32/build-papers3-epaper/pokeldn-radio-s3-papers3-1.6.2-v2.bin image/
           cp firmware/esp32/build-papers3-epaper/partition_table/partition-table.bin image/
           cp firmware/esp32/build-papers3-epaper/flash_args image/
-          git rev-parse HEAD > image/source-commit.txt
+          git -c safe.directory="$GITHUB_WORKSPACE" rev-parse HEAD > image/source-commit.txt
           cd image
           sha256sum *.bin > SHA256SUMS
       - uses: actions/upload-artifact@v7
