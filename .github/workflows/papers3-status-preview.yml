@@ -1,0 +1,43 @@
+name: PaperS3 status preview
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    if: github.repository == 'JasChiang/pokeldn' && !github.event.repository.private
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          repository: m5stack/M5GFX
+          ref: 347a23274081a105cb9fc0fc3bbf0e15c78e79c3
+          path: preview-deps/M5GFX
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Install rendering dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libsdl2-dev
+          python -m pip install Pillow==12.0.0 pyserial==3.5
+      - name: Render the real firmware functions without hardware
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/sprites"
+          curl --fail --location --retry 2 https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-iii/firered-leafgreen/25.png -o "$RUNNER_TEMP/sprites/25.png"
+          python tools/ldn/papers3_preview.py --status-demo --m5gfx preview-deps/M5GFX --sdl-prefix /usr --sprites "$RUNNER_TEMP/sprites" --output "$RUNNER_TEMP/papers3-status"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: papers3-status-simulations
+          path: ${{ runner.temp }}/papers3-status/
+          retention-days: 1
+          if-no-files-found: error

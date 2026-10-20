@@ -68,14 +68,41 @@ const char *radio_label(const scene_radio_t &r) {
     default: return "Radio ready";
     }
 }
-const char *show_label(const paper_model_t &m) {
+const char *show_label(const paper_model_t &m, const scene_radio_t &r) {
     switch (m.show) {
     case SHOW_TRADE: return "Offering Pokemon";
     case SHOW_TRADED: return m.arrived ? "Received Pokemon" : "Incoming Pokemon";
     case SHOW_GIFT: return "Offering gift";
     case SHOW_GIFTED: return "Gift sent";
-    default: return "USB Serial/JTAG";
+    default: return r.mode == SCENE_IDLE ? "USB Serial/JTAG" : "No Pokemon preview";
     }
+}
+
+const char *content_title(const paper_model_t &m, const scene_radio_t &r) {
+    if (m.title[0]) return m.title;
+    if (m.show != SHOW_AUTO) return show_label(m, r);
+    switch (r.mode) {
+    case SCENE_HOSTING: return "Room active";
+    case SCENE_JOINING: return "Connecting";
+    case SCENE_JOINED: return "Connected";
+    case SCENE_SNIFFING: return "Scanning";
+    default: return "Idle";
+    }
+}
+const char *content_line(const paper_model_t &m, const scene_radio_t &r) {
+    if (m.line[0]) return m.line;
+    if (m.show != SHOW_AUTO) return "No name provided by App";
+    return r.mode == SCENE_IDLE ? "Start a session in the Mac app" :
+                                "Waiting for App display data";
+}
+
+unsigned sprite_slot(const paper_model_t &m) {
+    return m.show == SHOW_TRADED ? SLOT_THEIRS :
+           (m.show == SHOW_GIFT || m.show == SHOW_GIFTED ? SLOT_GIFT : SLOT_OURS);
+}
+bool has_sprite(const paper_model_t &m) {
+    const paper_sprite_t &s = m.sprite[sprite_slot(m)];
+    return m.show != SHOW_AUTO && s.width && s.height;
 }
 
 void ball(PaperDisplay &d, int cx, int cy) {
@@ -87,10 +114,8 @@ void ball(PaperDisplay &d, int cx, int cy) {
     d.drawCircle(cx, cy, 10, BLACK);
 }
 void sprite(PaperDisplay &d, const paper_model_t &m) {
-    unsigned slot = m.show == SHOW_TRADED ? SLOT_THEIRS :
-                    (m.show == SHOW_GIFT || m.show == SHOW_GIFTED ? SLOT_GIFT : SLOT_OURS);
-    const paper_sprite_t &s = m.sprite[slot];
-    if (!s.width || !s.height || m.show == SHOW_AUTO) { ball(d, 762, 266); return; }
+    const paper_sprite_t &s = m.sprite[sprite_slot(m)];
+    if (!has_sprite(m)) { ball(d, 762, 266); return; }
     constexpr int scale = 4;
     const int x0 = 762 - s.width * scale / 2, y0 = 266 - s.height * scale / 2;
     // Host sprites light the body on a black OLED background. Keep that contrast.
@@ -115,15 +140,20 @@ void draw(PaperDisplay &d, const paper_model_t &m, const scene_radio_t &r, bool 
     d.setFont(&fonts::Font4); d.setTextSize(1.5);
     d.setCursor(34, 119); d.print(radio_label(r));
     d.setTextSize(1);
-    d.setCursor(34, 188); d.print(show_label(m));
+    d.setCursor(34, 188); d.print(show_label(m, r));
     d.setTextSize(2);
-    d.setCursor(34, 242); d.print(m.title[0] ? m.title : "Ready");
+    d.setCursor(34, 242); d.print(content_title(m, r));
     d.setTextSize(1);
-    d.setCursor(34, 313); d.print(m.line[0] ? m.line : "Choose a game in the Mac app");
+    d.setCursor(34, 313); d.print(content_line(m, r));
     d.setFont(&fonts::Font2);
     d.setCursor(34, 379); d.printf("Consoles: %u   RX: %lu   TX: %lu", r.stations,
                                  (unsigned long)r.rx, (unsigned long)r.tx);
     sprite(d, m);
+    if (!has_sprite(m)) {
+        d.setCursor(638, 413);
+        d.print(m.show == SHOW_AUTO ? (r.mode == SCENE_IDLE ? "No active preview" :
+                                      "Preview not received") : "Image unavailable");
+    }
     d.drawFastHLine(34, 440, 892, BLACK);
     d.setCursor(34, 462); d.print("Use the Mac app for the link code and session controls.");
     d.setCursor(34, 490); d.print("E-paper keeps its last image when powered off. Check the app for live status.");
