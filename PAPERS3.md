@@ -62,8 +62,21 @@ states, station count, sampled RX/TX counters, and the game / Pokemon title,
 name and one-bit sprite supplied through the existing DISPLAY protocol.
 Without a sprite it draws a Poke Ball. INFO identifies
 `board=PaperS3 variant=2 display=epaper`, while the numeric radio version remains
-1.6.2. The existing host protocol is compatible; see the PLA App startup fix
-below for an upstream v0.32.0 preview timing issue.
+1.6.2. This fork keeps the official host App and game launchers unchanged.
+
+### Official App preview limitations
+
+The panel can only show Pokemon metadata and sprites the App sends over
+DISPLAY. In official v0.32.0, the PLA launcher queues its first preview before
+USB radio initialization. A fast/cached sprite can reach the dispatcher while
+no radio exists, so the room starts but the preview is lost. A physical startup
+comparison reproduced zero DISPLAY commands in that case. The firmware cannot
+recover a game/Pokemon selection it never received.
+
+BDSP receiver-made gifts are a different case: the host intentionally waits for
+the console's offer before supplying a Pokemon. Thus "Waiting for console"
+with "Ready / Choose a game" does not by itself prove a display hardware fault.
+This fork documents these limitations and does not patch the official Mac App.
 
 There is **no link code field in DISPLAY**, so codes and controls stay in the
 Mac App. Text is capped at the protocol's 21 ASCII characters. No touchscreen
@@ -86,42 +99,6 @@ STATUS adds `epd=starting|ready|no_psram|init_failed|no_task` and `epd_updates=N
 Missing PSRAM or detected initialization failures disable this display path
 without intentionally resetting the radio. Driver/hardware faults can still
 affect the radio; the fallback is not isolation against every electrical failure.
-
-## Legends Arceus initial preview fix
-
-The official v0.32.0 PLA launcher submits its first preview before
-`transport.start()` opens the USB radio and completes HELLO. With a fast/cached
-sprite, the worker reaches `esp32_wlan.display` while no radio exists; both
-DISPLAY commands are silently lost. A slower image fetch can hide this race.
-The room can therefore say "Waiting for console" while the content stays
-"Ready / Choose a game". This is separate from BDSP receiver-made gifts, which
-intentionally wait for the console's offer before supplying a Pokemon.
-
-This fork moves only PLA's initial preview until after successful transport
-startup. A failed startup sends no preview. No firmware update is needed.
-Source builds include the change. For the official macOS v0.32.0 bundle, make a
-separate local App copy using:
-
-```sh
-python scripts/prepare_papers3_app.py \
-  --source /path/to/official/pokeldn.app \
-  --output /path/to/new/pokeldn-papers3.app
-```
-
-The helper verifies the original launcher hash, refuses to overwrite an output,
-copies the App, replaces its runpy-loaded PLA launcher and ad-hoc signs/verifies
-the copy. The original App, settings, keys and device Flash are unchanged.
-Use the resulting App for this fix; updating it with a generic official App
-can replace the fix. The helper is scoped to macOS v0.32.0 and PLA.
-
-On the physical PaperS3 with the same cached Growlithe artwork, the unmodified
-App's startup emitted zero DISPLAY commands. Three short starts of the fixed
-App each emitted SPRITE and SHOW after HELLO, with successful command replies.
-A separate 30-second hosting run completed the subsequent panel refresh
-(`epd_updates=2`), without additional framing errors. In that run the second
-refresh completed about 18 seconds after the preview was sent; allow startup
-and panel refresh time before judging the picture. Physical appearance remains
-a separate check. No Switch or trade was involved.
 
 ## Build variant 2 without flashing
 
@@ -169,8 +146,6 @@ NVS 0x9000, PHY 0xf000, factory app 0x10000 with 1 MiB capacity, merged offset 0
   Tests execute the real C parser against the official Python host encoders:
   odd-width and maximum sprites, all slots, malformed/truncated payloads,
   bounded text, reset/arrival handling and 10,000 deterministic random inputs.
-- Two additional PLA launcher tests exercise an instantaneous cached preview
-  after successful radio startup and no preview after startup failure.
 - The radio-only variant still compiles after the opt-in display changes.
 - No Switch was available. Association, LDN authentication, trades, battery-only
   operation, cold-plug startup and sustained RF load remain unverified.
@@ -184,7 +159,7 @@ python -m unittest discover -s tests -p test_papers3_display_model.py -v
 With development dependencies installed, also run the upstream screen tests:
 
 ```sh
-python -m pytest tests/test_papers3_display_model.py tests/test_esp32_screen.py tests/test_pla_screen_startup.py -q
+python -m pytest tests/test_papers3_display_model.py tests/test_esp32_screen.py -q
 ```
 
 The tested merged image was 701,248 bytes, with SHA-256:
